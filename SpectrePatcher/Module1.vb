@@ -59,6 +59,20 @@ Module Module1
         Dim downloadDir = System.Configuration.ConfigurationManager.AppSettings("downloadDir")
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
 
+        Try
+            If Not IO.Directory.Exists(downloadDir) Then
+                IO.Directory.CreateDirectory(downloadDir)
+            End If
+        Catch ex As Exception
+        End Try
+        Dim versionFile As String = IO.Path.Combine(downloadDir, My.Application.Info.Version.ToString)
+        If Not IO.File.Exists(versionFile) Then
+            For Each file As String In IO.Directory.GetFiles(downloadDir)
+                IO.File.Delete(file)
+            Next
+            IO.File.Create(versionFile)
+        End If
+
         Dim helper As New SpectrePatcherHelper
 
         Dim availableUpdates As List(Of String) = helper.GetUpdateList
@@ -88,27 +102,46 @@ Module Module1
 
                                 Console.WriteLine("**Lade herunter")
                                 Dim destFile As String = DownloadFile(downloadDir, downloadLink)
+
+
                                 If Not String.IsNullOrEmpty(destFile) Then
-                                    Console.WriteLine("**Installiere")
+                                    Try
+                                        Console.WriteLine("**Installiere")
 
-                                    Using p As New Process
+                                        Using p As New Process
 
-                                        p.StartInfo.FileName = destFile
-                                        p.StartInfo.Arguments = "/quiet /norestart"
-                                        p.StartInfo.CreateNoWindow = True
-                                        p.StartInfo.UseShellExecute = True
-                                        p.Start()
-                                        Dim start As DateTime = DateTime.Now.AddSeconds(60)
-                                        While Not p.HasExited
-                                            If start < DateTime.Now Then
-                                                Throw New TimeoutException
+                                            p.StartInfo.FileName = "wusa.exe"
+                                            p.StartInfo.Arguments = destFile & " /quiet /norestart"
+                                            p.StartInfo.CreateNoWindow = True
+                                            p.StartInfo.UseShellExecute = False
+                                            p.Start()
+                                            Threading.Thread.Sleep(500)
+                                            Dim start As DateTime = DateTime.Now.AddSeconds(60)
+                                            While Not p.HasExited
+                                                If start < DateTime.Now Then
+                                                    Throw New TimeoutException
+                                                End If
+                                                System.Threading.Thread.Sleep(1000)
+                                            End While
+                                            p.WaitForExit()
+                                            If p.ExitCode <> 0 Then
+                                                If p.ExitCode = -2145124329 Then
+                                                    'Update trifft auf System nicht zu.
+                                                ElseIf p.ExitCode = 2359302 Then
+                                                    'Update bereits installiert.
+                                                Else
+                                                    Throw New Exception(String.Format("Installation mit {0} fehlgeschlagen", p.ExitCode))
+
+                                                End If
                                             End If
-                                            System.Threading.Thread.Sleep(1000)
-                                        End While
 
+                                        End Using
+                                        Console.WriteLine("**Installiert")
 
-                                    End Using
-                                    Console.WriteLine("**Installiert")
+                                    Catch ex As Exception
+                                        IO.File.Delete(destFile)
+                                        Throw ex
+                                    End Try
                                 End If
 
                             End If
@@ -117,6 +150,7 @@ Module Module1
                             Console.WriteLine()
                         End If
                     Catch ex As Exception
+
                         helper.LogError(ex)
                     End Try
                 Next
