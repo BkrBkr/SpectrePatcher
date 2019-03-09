@@ -59,6 +59,7 @@ Module Module1
         Dim downloadDir = System.Configuration.ConfigurationManager.AppSettings("downloadDir")
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
 
+        Dim doReboot As Boolean = False
         Try
             If Not IO.Directory.Exists(downloadDir) Then
                 IO.Directory.CreateDirectory(downloadDir)
@@ -108,34 +109,22 @@ Module Module1
                                     Try
                                         Console.WriteLine("**Installiere")
 
-                                        Using p As New Process
 
-                                            p.StartInfo.FileName = "wusa.exe"
-                                            p.StartInfo.Arguments = destFile & " /quiet /norestart"
-                                            p.StartInfo.CreateNoWindow = True
-                                            p.StartInfo.UseShellExecute = False
-                                            p.Start()
-                                            Threading.Thread.Sleep(500)
-                                            Dim start As DateTime = DateTime.Now.AddSeconds(60)
-                                            While Not p.HasExited
-                                                If start < DateTime.Now Then
-                                                    Throw New TimeoutException
-                                                End If
-                                                System.Threading.Thread.Sleep(1000)
-                                            End While
-                                            p.WaitForExit()
-                                            If p.ExitCode <> 0 Then
-                                                If p.ExitCode = -2145124329 Then
-                                                    'Update trifft auf System nicht zu.
-                                                ElseIf p.ExitCode = 2359302 Then
-                                                    'Update bereits installiert.
-                                                Else
-                                                    Throw New Exception(String.Format("Installation mit {0} fehlgeschlagen", p.ExitCode))
+                                        Dim exitCode As Integer = StartProcess("wusa.exe", destFile & " /quiet /norestart")
+                                        If exitCode <> 0 Then
+                                            If exitCode = -2145124329 Then
+                                                'Update trifft auf System nicht zu.
+                                            ElseIf ExitCode = 2359302 Then
+                                                'Update bereits installiert.
+                                            ElseIf ExitCode = 3010 Then
+                                                'Neustart erforderlich#
+                                                doReboot = True
+                                            Else
+                                                Throw New Exception(String.Format("Installation mit {0} fehlgeschlagen", exitCode))
 
-                                                End If
                                             End If
+                                        End If
 
-                                        End Using
                                         Console.WriteLine("**Installiert")
 
                                     Catch ex As Exception
@@ -171,7 +160,36 @@ Module Module1
         End If
         System.IO.File.WriteAllLines(logFile, helper.ErrorLog)
 
+        If doReboot AndAlso System.Configuration.ConfigurationManager.AppSettings("reboot").ToLowerInvariant.Equals("true") Then
 
+            Reboot()
+        End If
+    End Sub
+
+    Private Function StartProcess(file As String, param As String) As Integer
+        Using p As New Process
+
+            p.StartInfo.FileName = file
+            p.StartInfo.Arguments = param
+            p.StartInfo.CreateNoWindow = True
+            p.StartInfo.UseShellExecute = False
+            p.Start()
+            Threading.Thread.Sleep(500)
+            Dim start As DateTime = DateTime.Now.AddSeconds(60)
+            While Not p.HasExited
+                If start < DateTime.Now Then
+                    Throw New TimeoutException
+                End If
+                System.Threading.Thread.Sleep(1000)
+            End While
+            p.WaitForExit()
+            Return p.ExitCode
+        End Using
+
+    End Function
+
+    Private Sub Reboot()
+        StartProcess("cmd", "/C shutdown -f -r -t 5")
     End Sub
 
 End Module
