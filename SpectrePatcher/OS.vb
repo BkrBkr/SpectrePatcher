@@ -7,13 +7,13 @@
 'the Free Software Foundation, either version 3 Of the License, Or
 '(at your option) any later version.
 
-'Foobar Is distributed In the hope that it will be useful,
+'SpectrePatcher Is distributed In the hope that it will be useful,
 'but WITHOUT ANY WARRANTY; without even the implied warranty of
 'MERCHANTABILITY Or FITNESS FOR A PARTICULAR PURPOSE.  See the
 'GNU General Public License For more details.
 
 'You should have received a copy Of the GNU General Public License
-'along with Foobar. If Not, see < http: //www.gnu.org/licenses/>.
+'along with SpectrePatcher. If Not, see < http: //www.gnu.org/licenses/>.
 Imports System.Runtime.InteropServices
 
 Public Class OS

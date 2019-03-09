@@ -9,10 +9,10 @@ Imports System.Runtime.InteropServices
 ' Werte der Assemblyattribute überprüfen
 
 <Assembly: AssemblyTitle("SpectrePatcherLib")>
-<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyDescription("SpectrePatcher is a tool to automatically download and install the Intel microcode updates released by Microsoft")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("SpectrePatcherLib")>
-<Assembly: AssemblyCopyright("Copyright ©  2019")>
+<Assembly: AssemblyProduct("SpectrePatcher")>
+<Assembly: AssemblyCopyright("Copyright(C) 2019 Björn Kremer")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
