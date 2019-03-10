@@ -79,13 +79,13 @@ Module Module1
 
             If helper.IsAMD Then
                 Console.WriteLine("******RegistryPatch AMD******")
-                Dim result As Integer = SpectrePatcherHelper.StartProcess("cmd.exe", "/c SpectreRegistryPatchAMD.cmd")
+                Dim result As Integer = SpectrePatcherHelper.StartProcess("cmd.exe", "/c " & IO.Path.Combine(My.Application.Info.DirectoryPath & "\", "SpectreRegistryPatchAMD.cmd"))
                 If result <> 0 Then
                     helper.LogError("Registry-Patch nicht angebracht")
                 End If
             Else
                 Console.WriteLine("******RegistryPatch Intel******")
-                Dim result As Integer = SpectrePatcherHelper.StartProcess("cmd.exe", "/c SpectreRegistryPatchIntel.cmd")
+                Dim result As Integer = SpectrePatcherHelper.StartProcess("cmd.exe", "/c " & IO.Path.Combine(My.Application.Info.DirectoryPath & "\", "SpectreRegistryPatchIntel.cmd"))
                 If result <> 0 Then
                     helper.LogError("Registry-Patch nicht angebracht")
                 End If
