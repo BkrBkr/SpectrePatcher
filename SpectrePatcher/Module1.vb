@@ -110,7 +110,7 @@ Module Module1
                                         Console.WriteLine("**Installiere")
 
 
-                                        Dim exitCode As Integer = StartProcess("wusa.exe", destFile & " /quiet /norestart")
+                                        Dim exitCode As Integer = SpectrePatcherHelper.StartProcess("wusa.exe", destFile & " /quiet /norestart")
                                         If exitCode <> 0 Then
                                             If exitCode = -2145124329 Then
                                                 'Update trifft auf System nicht zu.
@@ -158,7 +158,7 @@ Module Module1
             Next
 
         End If
-        System.IO.File.WriteAllLines(logFile, helper.ErrorLog)
+        System.IO.File.AppendAllLines(logFile, helper.ErrorLog)
 
         If doReboot AndAlso System.Configuration.ConfigurationManager.AppSettings("reboot").ToLowerInvariant.Equals("true") Then
 
@@ -166,30 +166,10 @@ Module Module1
         End If
     End Sub
 
-    Private Function StartProcess(file As String, param As String) As Integer
-        Using p As New Process
 
-            p.StartInfo.FileName = file
-            p.StartInfo.Arguments = param
-            p.StartInfo.CreateNoWindow = True
-            p.StartInfo.UseShellExecute = False
-            p.Start()
-            Threading.Thread.Sleep(500)
-            Dim start As DateTime = DateTime.Now.AddSeconds(60)
-            While Not p.HasExited
-                If start < DateTime.Now Then
-                    Throw New TimeoutException
-                End If
-                System.Threading.Thread.Sleep(1000)
-            End While
-            p.WaitForExit()
-            Return p.ExitCode
-        End Using
-
-    End Function
 
     Private Sub Reboot()
-        StartProcess("cmd", "/C shutdown -f -r -t 5")
+        SpectrePatcherHelper.StartProcess("cmd", "/C shutdown -f -r -t 5")
     End Sub
 
 End Module

@@ -28,6 +28,27 @@ Public Class SpectrePatcherHelper
         _errorLog.Add(ex.Message)
     End Sub
 
+    Public Shared Function StartProcess(file As String, param As String) As Integer
+        Using p As New Process
+
+            p.StartInfo.FileName = file
+            p.StartInfo.Arguments = param
+            p.StartInfo.CreateNoWindow = True
+            p.StartInfo.UseShellExecute = False
+            p.Start()
+            Threading.Thread.Sleep(500)
+            Dim start As DateTime = DateTime.Now.AddSeconds(60)
+            While Not p.HasExited
+                If start < DateTime.Now Then
+                    Throw New TimeoutException
+                End If
+                System.Threading.Thread.Sleep(1000)
+            End While
+            p.WaitForExit()
+            Return p.ExitCode
+        End Using
+
+    End Function
 
     Public Function GetUpdateList() As List(Of String)
         Dim retVal As New List(Of String)
