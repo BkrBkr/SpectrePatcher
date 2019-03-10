@@ -14,6 +14,7 @@
 
 'You should have received a copy Of the GNU General Public License
 'along with SpectrePatcher. If Not, see < http: //www.gnu.org/licenses/>.
+Imports System.Management
 Imports System.Net
 Imports System.Text.RegularExpressions
 Imports System.Xml
@@ -22,10 +23,10 @@ Public Class SpectrePatcherHelper
     Public ReadOnly Property ErrorLog As New List(Of String)
 
     Public Sub LogError(msg As String)
-        _errorLog.Add(msg)
+        _ErrorLog.Add(msg)
     End Sub
     Public Sub LogError(ex As Exception)
-        _errorLog.Add(ex.Message)
+        _ErrorLog.Add(ex.Message)
     End Sub
 
     Public Shared Function StartProcess(file As String, param As String) As Integer
@@ -48,6 +49,23 @@ Public Class SpectrePatcherHelper
             Return p.ExitCode
         End Using
 
+    End Function
+
+    Public Function IsAMD() As Boolean
+        Using mc As ManagementClass = New ManagementClass("Win32_Processor")
+            Using moc As ManagementObjectCollection = mc.GetInstances()
+
+                If moc.Count <> 0 Then
+
+                    For Each mo As ManagementObject In mc.GetInstances()
+                        If mo("Manufacturer").ToString().ToLowerInvariant.Contains("amd") Then
+                            Return True
+                        End If
+                    Next
+                End If
+                Return False
+            End Using
+        End Using
     End Function
 
     Public Function GetUpdateList() As List(Of String)
@@ -123,7 +141,7 @@ Public Class SpectrePatcherHelper
                 LogError("Kb-Nummer konnte nicht bestimmt werden.")
             End If
         End If
-            Return retVal
+        Return retVal
     End Function
 
     Public Function GetDownloadLink(patchGuid As String) As String

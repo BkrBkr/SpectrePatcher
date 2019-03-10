@@ -47,6 +47,7 @@ Module Module1
     Sub Main()
 
 
+
         Dim plattformType = "windows 10"
         If OS.IsWindowsServer() Then
             plattformType = "windows server"
@@ -75,6 +76,13 @@ Module Module1
         End If
 
         Dim helper As New SpectrePatcherHelper
+
+        If helper.IsAMD Then
+            SpectrePatcherHelper.StartProcess("cmd.exe", "/c pectreRegistryPatchAMD.cmd")
+        Else
+            SpectrePatcherHelper.StartProcess("cmd.exe", "/c SpectreRegistryPatchIntel.cmd")
+        End If
+
 
         Dim availableUpdates As List(Of String) = helper.GetUpdateList
 

@@ -123,4 +123,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y "$(ProjectDir)..\SpectreRegistryPatchIntel.cmd" "$(TargetDir)"
+xcopy /Y "$(ProjectDir)..\SpectreRegistryPatchAMD.cmd" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
