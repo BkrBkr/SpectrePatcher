@@ -72,7 +72,15 @@ Module Module1
                 For Each file As String In IO.Directory.GetFiles(downloadDir)
                     IO.File.Delete(file)
                 Next
-                IO.File.Create(versionFile)
+                IO.File.WriteAllText(versionFile, Environment.OSVersion.VersionString)
+            Else
+                Dim versionNumber As String = IO.File.ReadAllText(versionFile)
+                If Not versionNumber.Equals(Environment.OSVersion.VersionString) Then
+                    For Each file As String In IO.Directory.GetFiles(downloadDir)
+                        IO.File.Delete(file)
+                    Next
+                End If
+                IO.File.WriteAllText(versionFile, Environment.OSVersion.VersionString)
             End If
 
 

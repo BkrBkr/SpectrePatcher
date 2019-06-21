@@ -38,7 +38,7 @@ Public Class SpectrePatcherHelper
             p.StartInfo.UseShellExecute = False
             p.Start()
             Threading.Thread.Sleep(500)
-            Dim start As DateTime = DateTime.Now.AddSeconds(60)
+            Dim start As DateTime = DateTime.Now.AddSeconds(120)
             While Not p.HasExited
                 If start < DateTime.Now Then
                     Throw New TimeoutException
