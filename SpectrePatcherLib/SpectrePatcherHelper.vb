@@ -169,6 +169,52 @@ Public Class SpectrePatcherHelper
     End Function
 
 
+    Public Function DownloadFile(destPath As String, downloadLink As String) As String
+        Dim downloadLinkParts As String() = downloadLink.Split("/"c)
+        Dim destFile As String = IO.Path.Combine(destPath, downloadLinkParts(downloadLinkParts.Length - 1))
+        If IO.File.Exists(destFile) Then
+            Console.WriteLine("**Datei bereits heruntergeladen")
+            Return Nothing
+        Else
+            Dim checkSum As String = GetCheckSum(downloadLink)
+            If (String.IsNullOrEmpty(checkSum)) Then
+                Return Nothing
+            End If
+
+            Using client As New Net.WebClient
+                client.DownloadFile(downloadLink, destFile)
+            End Using
+
+            If ValidateCheckSum(checkSum, destFile) Then
+                Console.WriteLine("**Datei heruntergeladen")
+                Return destFile
+            Else
+                IO.File.Delete(destFile)
+                LogError("**Ungültige Checksumme")
+                Return Nothing
+            End If
+        End If
+    End Function
 
 
+
+    Public Function GetCheckSum(url As String) As String
+        Dim checkSumMatch As Match = Regex.Match(url, "_(?<checksum>[^.]+)\.", RegexOptions.IgnoreCase Or RegexOptions.Singleline Or RegexOptions.IgnorePatternWhitespace Or RegexOptions.ExplicitCapture)
+        If checkSumMatch.Success AndAlso checkSumMatch.Groups("checksum") IsNot Nothing AndAlso Not String.IsNullOrEmpty(checkSumMatch.Groups("checksum").Value) Then
+            Return checkSumMatch.Groups("checksum").Value
+        Else
+            LogError("**Checksumme nicht gefunden")
+            Return Nothing
+        End If
+    End Function
+
+    Public Function ValidateCheckSum(refCheckSum As String, file As String) As Boolean
+        Dim checkSum As String = Nothing
+        Using fileStream As IO.FileStream = IO.File.OpenRead(file)
+            Using sha1 As System.Security.Cryptography.SHA1 = System.Security.Cryptography.SHA1.Create()
+                checkSum = BitConverter.ToString(sha1.ComputeHash(fileStream)).Replace("-", "")
+            End Using
+        End Using
+        Return refCheckSum.ToLowerInvariant().Equals(checkSum.ToLowerInvariant())
+    End Function
 End Class

@@ -23,21 +23,6 @@ Imports SpectrePatcherLib
 
 Module Module1
 
-    Public Function DownloadFile(destPath As String, downloadLink As String) As String
-        Dim downloadLinkParts As String() = downloadLink.Split("/"c)
-        Dim destFile As String = IO.Path.Combine(destPath, downloadLinkParts(downloadLinkParts.Length - 1))
-        If IO.File.Exists(destFile) Then
-            Console.WriteLine("**Datei bereits heruntergeladen")
-            Return Nothing
-        Else
-
-            Using client As New Net.WebClient
-                client.DownloadFile(downloadLink, destFile)
-            End Using
-            Console.WriteLine("**Datei heruntergeladen")
-            Return destFile
-        End If
-    End Function
 
 
 
@@ -126,7 +111,7 @@ Module Module1
 
 
                                     Console.WriteLine("**Lade herunter")
-                                    Dim destFile As String = DownloadFile(downloadDir, downloadLink)
+                                    Dim destFile As String = helper.DownloadFile(downloadDir, downloadLink)
 
 
                                     If Not String.IsNullOrEmpty(destFile) Then
@@ -141,8 +126,10 @@ Module Module1
                                                 ElseIf exitCode = 2359302 Then
                                                     'Update bereits installiert.
                                                 ElseIf exitCode = 3010 Then
-                                                    'Neustart erforderlich#
+                                                    'Neustart erforderlich
+                                                    Console.WriteLine("**Neustart erforderlich. Patchvorgang unvollständig")
                                                     doReboot = True
+                                                    Exit For
                                                 Else
                                                     Throw New Exception(String.Format("Installation mit {0} fehlgeschlagen", exitCode))
 
