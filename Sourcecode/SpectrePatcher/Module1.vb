@@ -19,17 +19,19 @@
 Imports System.Net
 Imports System.Text.RegularExpressions
 Imports System.Xml
+Imports AutoUpdaterDotNET
 Imports SpectrePatcherLib
 
 Module Module1
 
-
-
-
-
-
-
     Sub Main()
+        AddHandler AutoUpdater.CheckForUpdateEvent, AddressOf AutoUpdaterOnCheckForUpdateEvent
+        AutoUpdater.Mandatory = True
+        AutoUpdater.UpdateMode = Mode.ForcedDownload
+        AutoUpdater.Start("https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml")
+    End Sub
+
+    Private Sub RunLogic()
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
         Dim helper As New SpectrePatcherHelper
         Dim doReboot As Boolean = False
@@ -184,6 +186,24 @@ Module Module1
             Reboot()
         End If
         Environment.Exit(Environment.ExitCode)
+    End Sub
+
+    Private Sub AutoUpdaterOnCheckForUpdateEvent(ByVal args As UpdateInfoEventArgs)
+        If args IsNot Nothing Then
+            If args.IsUpdateAvailable Then
+                Try
+                    AutoUpdater.DownloadUpdate()
+                Catch ex As Exception
+                    Dim helper As New SpectrePatcherHelper
+                    helper.LogError(ex)
+                End Try
+            Else
+                RunLogic()
+            End If
+        Else
+            Dim helper As New SpectrePatcherHelper
+            helper.LogError("Fehler beim Installieren des Updates")
+        End If
     End Sub
 
 
