@@ -178,7 +178,6 @@ Public Class SpectrePatcherHelper
         Else
             Dim checkSum As String = GetCheckSum(downloadLink)
             If (String.IsNullOrEmpty(checkSum)) Then
-                LogError("**Checksumme nicht gefunden")
                 Return Nothing
             End If
 

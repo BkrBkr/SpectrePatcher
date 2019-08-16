@@ -55,9 +55,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoUpdater.NET, Version=1.5.5.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autoupdater.NET.Official.1.5.5\lib\net40\AutoUpdater.NET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -118,7 +115,6 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpectrePatcherLib\SpectrePatcherLib.vbproj">
@@ -129,7 +125,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(ProjectDir)..\SpectreRegistryPatchIntel.cmd" "$(TargetDir)"
-xcopy /Y "$(ProjectDir)..\SpectreRegistryPatchAMD.cmd" "$(TargetDir)"
-xcopy /Y "$(ProjectDir)..\LICENSE" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(ProjectDir)..\SpectreRegistryPatchAMD.cmd" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
