@@ -17,19 +17,34 @@
 'along with SpectrePatcher. If Not, see < http: //www.gnu.org/licenses/>.
 
 Imports System.Net
+Imports System.Reflection
 Imports System.Text.RegularExpressions
 Imports System.Xml
 Imports SpectrePatcherLib
 
 Module Module1
 
+    Private Sub autoUpdate()
+        Dim exePath As String = System.Reflection.Assembly.GetEntryAssembly().Location
+        Dim workingDir As String = New System.IO.FileInfo(exePath).Directory.FullName
+        Dim version As Version = Assembly.GetExecutingAssembly().GetName().Version
+        Dim p As New Process()
+        Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
 
+        p.StartInfo.FileName = updateExe
+        p.StartInfo.Arguments = String.Format(" ""{0}"" ""{1}"" ""{2}"" ", version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath)
+        p.Start()
+        p.WaitForExit()
 
-
-
-
+        If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
+            IO.File.Delete(updateExe)
+            IO.File.Move(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update"), updateExe)
+        End If
+    End Sub
 
     Sub Main()
+        autoUpdate()
+
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
         Dim helper As New SpectrePatcherHelper
         Dim doReboot As Boolean = False
