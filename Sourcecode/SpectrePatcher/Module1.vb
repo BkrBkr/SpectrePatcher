@@ -24,17 +24,22 @@ Imports SpectrePatcherLib
 
 Module Module1
 
-    Private Sub autoUpdate()
+    Private Sub autoUpdate(logFile As String)
         Dim exePath As String = System.Reflection.Assembly.GetEntryAssembly().Location
         Dim workingDir As String = New System.IO.FileInfo(exePath).Directory.FullName
         Dim version As Version = Assembly.GetExecutingAssembly().GetName().Version
         Dim p As New Process()
         Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
 
-        p.StartInfo.FileName = updateExe
-        p.StartInfo.Arguments = String.Format(" ""{0}"" ""{1}"" ""{2}"" ", version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath)
+        p.StartInfo.FileName = "cmd.exe"
+        p.StartInfo.Arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" 2>> ""{4}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath, logFile)
+
         p.Start()
         p.WaitForExit()
+
+        If p.ExitCode <> 0 Then
+            Throw New InvalidOperationException(String.Format("Error during auto update. Error-Code {0}", p.ExitCode))
+        End If
 
         If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
             IO.File.Delete(updateExe)
@@ -43,12 +48,12 @@ Module Module1
     End Sub
 
     Sub Main()
-        autoUpdate()
-
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
         Dim helper As New SpectrePatcherHelper
         Dim doReboot As Boolean = False
         Try
+
+            autoUpdate(logFile)
             Dim downloadDir = System.Configuration.ConfigurationManager.AppSettings("downloadDir")
             Try
                 If Not IO.Directory.Exists(downloadDir) Then
