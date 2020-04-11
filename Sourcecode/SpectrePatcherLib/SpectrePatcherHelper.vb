@@ -209,7 +209,7 @@ Public Class SpectrePatcherHelper
                 End If
             Next
         Else
-            If Not update.Equals("Summary of Intel microcode updates") Then
+            If Not update.ToLowerInvariant.Equals("summary of intel microcode updates") Then
                 LogError("Kb-Nummer konnte nicht bestimmt werden.")
             End If
         End If
