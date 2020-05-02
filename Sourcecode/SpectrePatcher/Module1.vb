@@ -31,17 +31,22 @@ Module Module1
 
         Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
 
-        Dim fileName = "cmd.exe"
-        Dim arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" ""{4}"" 2>> ""{5}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", "https://github.com/BkrBkr/", exePath, logFile)
-        Dim exitCode As Integer = SpectrePatcherHelper.StartProcess(fileName, arguments)
-
-        If exitCode <> 0 Then
-            Throw New InvalidOperationException(String.Format("Error during auto update. Error-Code {0}", exitCode))
+        If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
+            IO.File.Delete(updateExe)
+            IO.File.Move(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update"), updateExe)
         End If
+
+        Dim fileName = "cmd.exe"
+        Dim arguments = String.Format("/C """"{0}"" -currentVersion=""{1}"" -updateManifestUrl=""{2}"" -downloadServerPrefix=""{3}"" -pathToMainProgram=""{4}"" 2>> ""{5}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", "https://github.com/BkrBkr/", exePath, logFile)
+        Dim exitCode As Integer = SpectrePatcherHelper.StartProcess(fileName, arguments)
 
         If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
             IO.File.Delete(updateExe)
             IO.File.Move(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update"), updateExe)
+        End If
+
+        If exitCode <> 0 Then
+            Throw New InvalidOperationException(String.Format("Error during auto update. Error-Code {0}", exitCode))
         End If
     End Sub
 
