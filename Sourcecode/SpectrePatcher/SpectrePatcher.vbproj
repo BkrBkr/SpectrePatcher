@@ -124,6 +124,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="NDesk.Options.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SimpleAutoUpdate.NET.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

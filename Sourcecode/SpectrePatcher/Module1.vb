@@ -16,6 +16,7 @@
 'You should have received a copy Of the GNU General Public License
 'along with SpectrePatcher. If Not, see < http: //www.gnu.org/licenses/>.
 
+Imports System.IO
 Imports System.Net
 Imports System.Reflection
 Imports System.Text.RegularExpressions
@@ -31,19 +32,28 @@ Module Module1
 
         Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
 
+        CopyUpdate(workingDir)
+
         Dim fileName = "cmd.exe"
-        Dim arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" 2>> ""{4}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath, logFile)
+        Dim arguments = String.Format("/C """"{0}"" -currentVersion=""{1}"" -updateManifestUrl=""{2}"" -downloadServerPrefix=""{3}"" -pathToMainProgram=""{4}"" 2>> ""{5}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", "https://github.com/BkrBkr/", exePath, logFile)
         Dim exitCode As Integer = SpectrePatcherHelper.StartProcess(fileName, arguments)
+
+        CopyUpdate(workingDir)
 
         If exitCode <> 0 Then
             Throw New InvalidOperationException(String.Format("Error during auto update. Error-Code {0}", exitCode))
         End If
-
-        If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
-            IO.File.Delete(updateExe)
-            IO.File.Move(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update"), updateExe)
-        End If
     End Sub
+
+    Private Sub CopyUpdate(workingDir As String)
+        Dim d As New DirectoryInfo(workingDir)
+        For Each file As FileInfo In d.GetFiles("*.update")
+            Dim destFile As String = file.Name.Substring(0, file.Name.Length - ".update".Length)
+            IO.File.Delete(destFile)
+            file.MoveTo(destFile)
+        Next
+    End Sub
+
 
     Sub Main()
         Dim logFile = System.Configuration.ConfigurationManager.AppSettings("logFile")
