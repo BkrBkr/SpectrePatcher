@@ -98,6 +98,7 @@ Public Class SpectrePatcherHelper
 
 
     Public Shared Function StartProcess(file As String, param As String) As Integer
+        Dim exitCode As Integer = 0
         Using p As New Process
 
             p.StartInfo.FileName = file
@@ -114,9 +115,10 @@ Public Class SpectrePatcherHelper
                 System.Threading.Thread.Sleep(1000)
             End While
             p.WaitForExit()
-            Return p.ExitCode
-        End Using
 
+            exitCode = p.ExitCode
+        End Using
+        Return exitCode
     End Function
 
     Private Function IsAMD() As Boolean
