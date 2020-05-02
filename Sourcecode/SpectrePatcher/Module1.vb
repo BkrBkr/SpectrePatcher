@@ -32,7 +32,7 @@ Module Module1
         Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
 
         Dim fileName = "cmd.exe"
-        Dim arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" 2>> ""{4}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath, logFile)
+        Dim arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" ""{4}"" 2>> ""{5}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", "https://github.com/BkrBkr/", exePath, logFile)
         Dim exitCode As Integer = SpectrePatcherHelper.StartProcess(fileName, arguments)
 
         If exitCode <> 0 Then
