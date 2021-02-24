@@ -1,3 +1,6 @@
+# SpectrePatcher will bis discontinued. 
+SpectrePatcher will bis discontinued, because the microcode updates are now part of the windows updates
+
 # SpectrePatcher
 SpectrePatcher is a tool to automatically download and install the Intel microcode updates released by Microsoft.
 SpectrePatcher dient dazu die von Microsoft veröffentlichten Microcode-Updates automatisiert herunterzuladen und zu installieren.
