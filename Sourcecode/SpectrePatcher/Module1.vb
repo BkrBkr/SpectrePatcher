@@ -30,19 +30,14 @@ Module Module1
         Dim version As Version = Assembly.GetExecutingAssembly().GetName().Version
 
         Dim updateExe As String = IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe")
+        Try
+            If IO.File.Exists(updateExe) Then
+                IO.File.Delete(updateExe)
+            End If
+        Catch ex As Exception
 
-        Dim fileName = "cmd.exe"
-        Dim arguments = String.Format("/C """"{0}"" ""{1}"" ""{2}"" ""{3}"" 2>> ""{4}""""", updateExe, version.ToString(), "https://raw.githubusercontent.com/BkrBkr/SpectrePatcher/master/update.xml", exePath, logFile)
-        Dim exitCode As Integer = SpectrePatcherHelper.StartProcess(fileName, arguments)
+        End Try
 
-        If exitCode <> 0 Then
-            Throw New InvalidOperationException(String.Format("Error during auto update. Error-Code {0}", exitCode))
-        End If
-
-        If IO.File.Exists(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update")) Then
-            IO.File.Delete(updateExe)
-            IO.File.Move(IO.Path.Combine(workingDir, "SimpleAutoUpdate.NET.exe.update"), updateExe)
-        End If
     End Sub
 
     Sub Main()
